@@ -10,6 +10,7 @@ packages = [{include = "lab_riddle_server"}]
 python = "^3.10"
 django-banjo = "^0.2.9"
 fuzzywuzzy = "^0.18.0"
+python-Levenshtein = "^0.12.2"
 
 
 [build-system]

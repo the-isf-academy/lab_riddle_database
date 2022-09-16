@@ -36,10 +36,12 @@ class Riddle(Model):
 
     def is_valid(self):
         "Checks whether this riddle is valid. In other words, when validate() finds no errors."
+
         return len(self.validate()) == 0
 
     def validate_create(self):
         "Checks whether this riddle can be saved"
+
         errors = []
         if self.question == "":
             errors.append("question is required")
@@ -47,6 +49,21 @@ class Riddle(Model):
             errors.append("answer is required")
         return errors
 
+    def check_guess(self, guess):
+        """Checks whether a guess is correct and logs the attempt.
+        We don't want to be too strict, so we will accept guesses which are close to the answer. """
+        
+        self.guesses += 1
+        similarity = fuzz.ratio(guess.lower(), self.answer.lower())
+        
+        if similarity >= self.MIN_FUZZ_RATIO:
+            self.correct+= 1
+            self.save()
+            return True
+        else:
+            self.save()
+            return False
+        
     def difficulty(self):
         """Calculates and returns the riddle's difficulty. 
         The difficulty is basically 1 minus the fraction of guesses which were correct. 
@@ -68,31 +85,10 @@ class Riddle(Model):
         With smoothing, a Riddle's difficulty can only be really high if there are few correct guesses
         and a lot of guesses. This seems like the right way to define difficulty.
         """
+        
         return 1 - (self.correct + 1) / (self.guesses + 1)
 
 
-    def check_guess(self, guess):
-        """Checks whether a guess is correct and logs the attempt.
-        We don't want to be too strict, so we will accept guesses which are close to the answer.
-        Fuzzy string-matching is an interesting problem, which we will sidestep by using the
-        `fuzzywuzzy` library. `FUZZ_RATIO` is our limit for how similar the answers have to be.
-        Also, we don't care about upper-case and lower-case, so we'll cast everything to lower.
-        For example, consider the riddle, "What's brown and sticky?" The answer, of course, is
-        "A stick" Here are some attempts with their fuzz ratios:                                                                                               
-        - "a stick"         100
-        - "a stik"          92
-        - "stick"           83
-        - "it's a stick"    74
-        - "idk"             40                                                                                             """
-        self.guesses += 1
-        similarity = fuzz.ratio(guess.lower(), self.answer.lower())
-        
-        if similarity >= self.MIN_FUZZ_RATIO:
-            self.correct+= 1
-            self.save()
-            return True
-        else:
-            self.save()
-            return False
-        
+
+
 
