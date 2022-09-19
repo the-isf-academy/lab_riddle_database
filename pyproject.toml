@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "lab-riddle-server"
+name = "lab-riddle-database"
 version = "0.1.0"
 description = ""
 authors = ["emma <eqbrown@isf.edu.hk>"]
 readme = "README.md"
-packages = [{include = "lab_riddle_server"}]
+packages = [{include = "lab_riddle_database"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
